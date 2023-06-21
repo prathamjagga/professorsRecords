@@ -1,23 +1,24 @@
 const Professor = require("../models/Professor");
 const ResearchPaper = require("../models/ResearchPaper");
 const { generateToken } = require("../utils/jwt");
+const { client } = require("../utils/twilio");
+const otpGenerator = require("otp-generator");
 
 // Professor registration
 const register = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { phone, name } = req.body;
 
     // Check if professor already exists
-    const professorExists = await Professor.findOne({ email });
+    const professorExists = await Professor.findOne({ phone });
     if (professorExists) {
       return res.status(400).json({ error: "Professor already exists" });
     }
 
     // Create new professor
     const professor = new Professor({
-      email,
-      password,
       name,
+      phone,
       coins: 0,
     });
 
@@ -160,7 +161,40 @@ const info = async (req, res) => {
   }
 };
 
-const sendOTP = async (req, res) => {};
+const sendOTP = async (req, res) => {
+  const { phone } = req.body;
+
+  try {
+    const professor = await Professor.find({ phone });
+    if (!professor)
+      return res
+        .json({ error: "professor does not exists with given number" })
+        .status(404);
+
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    // Store OTP and expiry time in the database
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
+    await Professor.findOneAndUpdate({ phone }, { otp, otpExpiry });
+
+    // Send OTP via SMS using Twilio
+    await client.messages.create({
+      body: `Your OTP from Panipat Institute of Engineerig and Technology is: ${otp}`,
+      from: "+15418723758",
+      to: phone,
+    });
+
+    res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ error: "Failed to send OTP" });
+  }
+};
 
 module.exports = {
   register,
@@ -170,4 +204,5 @@ module.exports = {
   allResearchPapers,
   claim,
   info,
+  sendOTP,
 };

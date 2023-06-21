@@ -34,4 +34,6 @@ router.post("/claim", professorController.claim);
 
 router.get("/info", requireAuth, professorController.info);
 
+router.post("/get-otp", professorController.sendOTP);
+
 module.exports = router;

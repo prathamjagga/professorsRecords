@@ -160,6 +160,8 @@ const info = async (req, res) => {
   }
 };
 
+const sendOTP = async (req, res) => {};
+
 module.exports = {
   register,
   login,

@@ -19,6 +19,12 @@ const professorSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  otp: {
+    type: String,
+  },
+  otpExpiry: {
+    type: Date,
+  },
 });
 
 // Hash the password before saving to the database

@@ -1,20 +1,23 @@
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import AdminLogin from "./components/AdminLogin";
+import AdminDashboard from "./components/AdminDashboard";
+import ProfessorDashboard from "./components/ProfessorDashboard";
 
-function Home() {
+const App = () => {
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Home View</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adip.</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/professor-dashboard" element={<ProfessorDashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
-
-function App() {
-  return (
-    <Router>
-      <Route exact path="/" Component={<Home />} />
-    </Router>
-  );
-}
+};
 
 export default App;

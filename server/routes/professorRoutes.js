@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer"); // For handling file uploads
 const professorController = require("../controllers/professorController");
 const { uploadPath } = require("../config/config");
-const { requireAuth } = require("../middlewares/authMiddleware");
+const { requireAuth, localVariables } = require("../middlewares/authMiddleware");
 
 // Multer configuration for handling file uploads
 const upload = multer({ dest: uploadPath });
@@ -34,4 +34,9 @@ router.post("/claim", professorController.claim);
 
 router.get("/info", requireAuth, professorController.info);
 
+router.get("/sendOTP", professorController.verifyUser, localVariables, professorController.sendOTP)
+
+router.get("/verifyOTP", professorController.veriyfyOTP)
+
+router.put("/resetPassword",requireAuth, professorController.resetPassword);
 module.exports = router;

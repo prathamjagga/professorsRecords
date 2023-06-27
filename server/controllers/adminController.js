@@ -30,7 +30,7 @@ const login = async (req, res) => {
 const getProfessors = async (req, res) => {
   try {
     const professors = await Professor.find();
-    res.json({ professors });
+    res.json({professors });
   } catch (error) {
     console.error("Error in getting professors:", error);
     res.status(500).json({ error: "Server error" });

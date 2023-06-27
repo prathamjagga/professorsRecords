@@ -1,6 +1,9 @@
 const Professor = require("../models/Professor");
 const ResearchPaper = require("../models/ResearchPaper");
 const { generateToken } = require("../utils/jwt");
+const pkg = require('otp-generator') 
+const bcrypt = require('bcrypt');
+// const nodemailer = require("nodemailer")
 
 // Professor registration
 const register = async (req, res) => {
@@ -160,7 +163,147 @@ const info = async (req, res) => {
   }
 };
 
-const sendOTP = async (req, res) => {};
+
+
+const verifyUser =  async (req, res, next)=> {
+  try {
+    const { email } = req.method === "GET" ? req.query : req.body;
+    // now lets verufy the user
+
+    let professor = await Professor.findOne({ email });
+
+    if (!professor) {
+      return res.json(404).send({ error: "Professor not found" });
+    }
+
+    next()
+  } catch (error) {
+    return res.status(404).send({ error: "Authentication error" });
+  }
+}
+
+
+
+
+/** GET generateOTP http://localhost:3500/sendOTP?email=.... */
+const sendOTP = async (req, res) => {
+  try {
+
+    req.app.locals.OTP = pkg.generate(6, {upperCaseAlphabets:false, 
+      lowerCaseAlphabets:false, specialChars:false});
+    res.status(201).send({code:req.app.locals.OTP, msg:"otp sended successfully"});
+
+  } catch (error) {
+    console.log({"error":error})
+  }
+  };
+
+
+//   const emailSend = async(req, res) =>{
+//     try {
+
+
+// var transport = nodemailer.createTransport({
+//   service:"gmail",
+//   // host:"smtp.ethereal.email",
+//   // port:25 || 465 || 587 || 2525,
+//   auth:{
+//       user:"",
+//       pass:""
+//   }
+// })
+
+
+// var mailObject = {
+//   from:"", 
+//   to:req.email,
+//   subject:req.subject,
+//   text:req.text,
+//   html:"<br><b>Your OTP for verification for forgot password</b>"
+// };
+
+// transport.sendMail(mailObject, (error, info) => {
+//   if (error) {
+//       return console.log(error);
+//   }
+
+//   console.log('Message sent: %s', info);
+//   res.status(201).send({msg:"email sent successfully"})
+// });
+
+//     } catch (error) {
+//       console.log({"error":error})
+//     }
+
+//   }
+
+
+
+/**GET verifyOTP http://localhost:3500/verifyOTP?email=....&OTP=... */
+const veriyfyOTP = async (req, res)=> {
+
+  try {
+    const code= req.query.OTP; 
+    console.log(code)
+
+  if(parseInt(req.app.locals.OTP) === parseInt(code)) {
+    req.app.locals.OTP = null;   // set the OTP to null
+    req.app.locals.resetSession = true;  // start the session
+    // now you can reset your password
+    return res.status(201).send({msg:"verified Successfully"});
+  } 
+  else 
+  return res.status(400).send({msg:"Invalid OTP"});
+
+  } catch (error) {
+      res.status(500).send({error:"Internal server error"});
+  }  
+}
+
+
+
+/* PUT resetPassword http://localhost:3500/resetPassword 
+body {
+    new password :"",
+    confirm password:""
+}
+*/
+
+const resetPassword =  async (req, res)=> {
+  try {
+
+    if(!req.app.locals.resetSession) return res.status(404).send("Session expired")
+    
+    // I can reset my password now
+      const{email, password} = req.body;
+      const ProfessorId = req.user;
+      
+      var salt = bcrypt.genSaltSync(10);
+      var hasPassword = bcrypt.hashSync(password, salt);
+      
+      if(hasPassword) {
+        
+      const updated = await Professor.findOneAndUpdate({_id:req.user}, {$set:{password:hasPassword}}, {new:true})
+      req.app.locals.resetSession = false; 
+     
+      return res.status(201).send({msg:"record updated", updated})
+        
+      }else {
+        return res.status(400).status({error:"Password not hashed"})
+      }
+
+      
+  } 
+
+  catch (error) {
+    return res.status(500).send("Internal server error");
+  }
+}
+
+
+
+
+
 
 module.exports = {
   register,
@@ -170,4 +313,9 @@ module.exports = {
   allResearchPapers,
   claim,
   info,
+  verifyUser,
+  sendOTP,
+  veriyfyOTP, 
+  resetPassword,
+  
 };

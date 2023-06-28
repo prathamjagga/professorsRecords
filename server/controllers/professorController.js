@@ -36,28 +36,6 @@ const register = async (req, res) => {
 };
 
 // Professor login
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Find the professor by email
-    const professor = await Professor.findOne({ email });
-
-    // Check if professor exists and verify password
-    if (professor && (await professor.comparePassword(password))) {
-      // Generate JWT token
-      const token = generateToken(String(professor._id));
-      console.log(JSON.stringify(professor._id));
-
-      res.json({ token });
-    } else {
-      res.status(401).json({ error: "Invalid email or password" });
-    }
-  } catch (error) {
-    console.error("Error in professor login:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
 
 // Get research papers for a professor
 const getResearchPapers = async (req, res) => {
@@ -193,6 +171,31 @@ const sendOTP = async (req, res) => {
   } catch (error) {
     console.error("Error sending OTP:", error);
     res.status(500).json({ error: "Failed to send OTP" });
+  }
+};
+
+const login = async (req, res) => {
+  try {
+    console.log("inside login");
+    const { phone, otp } = req.body;
+    const professor = await Professor.findOne({ phone });
+    if (!professor)
+      return res
+        .json({ error: "no professor exists with this phone number" })
+        .status(404);
+    console.log(professor._id);
+    // console.log(String(generateToken(professor._id)));
+    console.log(Date.now());
+
+    if (professor.otp === otp && professor.otpExpiry >= Date.now()) {
+      return res
+        .json({ token: generateToken(String(professor._id)) })
+        .status(200);
+    } else {
+      return res.status(401).json({ error: "otp incorrect" });
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
 

@@ -6,6 +6,8 @@ import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
 import ProfessorDashboard from "./components/ProfessorDashboard";
 
+import "./Global.css"
+
 const App = () => {
   return (
     <BrowserRouter>

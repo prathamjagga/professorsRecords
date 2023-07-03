@@ -28,6 +28,22 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
+
+const localVariables = (req, res, next)=>{
+  try {
+    req.app.locals = {
+      OTP:null, 
+      resetSession:false
+      
+    }
+    next();
+  } catch (error) {
+    console.error("Error in OTP localvariables:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
 module.exports = {
+  localVariables,
   requireAuth,
 };

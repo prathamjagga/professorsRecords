@@ -91,11 +91,11 @@ const Login = () => {
             for="otp"
             className="block mb-2 text-sm font-medium text-black-900 dark:text-black"
           >
-            Enter OTP
+            Enter Password
           </label>
           <input
             type="text"
-            id="otp"
+            id="password"
             className="bg-white-50 border border-white-300 text-black-900 text-sm rounded-lg focus:ring-white-500 focus:border-white-500 block w-full p-2.5 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-black dark:focus:ring-white-500 dark:focus:border-white-500"
             required
           />

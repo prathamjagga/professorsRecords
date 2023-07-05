@@ -7,4 +7,5 @@ body {
   background-image: radial-gradient(#19a05127 2.5px, transparent 1px);
   background-position: 0 0, 8px 8px;
   background-size: 16px 16px;
+  padding: 40px;
 }

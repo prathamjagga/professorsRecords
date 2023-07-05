@@ -2,7 +2,7 @@ import React from "react";
 
 function TopProfList() {
   return (
-    <div class="overflow-hidden rounded-lg border border-gray-200 shadow-md mt-4">
+    <div class="overflow-x-scroll rounded-lg border border-gray-200 shadow-md mt-4">
       <h4 className="bg-white text-gray-500 font-bold pt-4 pl-4 pb-4">
         {" "}
         Top Professors Ranks

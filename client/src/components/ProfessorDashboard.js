@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProfileCard from "./ProfileCard";
-import Logo from "../assets/logo.png";
 import ProfessorNavbar from "./utils/ProfessorNavbar";
+import Toolkit from "./utils/Toolkit";
 
 function ProfessorDashboard() {
   // States
@@ -12,6 +12,15 @@ function ProfessorDashboard() {
       <ProfessorNavbar />
       <div className="flex">
         <ProfileCard />
+        <div className="bg-white/5 p-4 m-4 shadow-lg " style={{ width: "60%" }}>
+          <h2
+            className="text-2xl text-center font-bold text-gray-700"
+            style={{ width: "100%" }}
+          >
+            Utilities{" "}
+          </h2>
+          <Toolkit />
+        </div>
       </div>
     </div>
   );

@@ -3,8 +3,11 @@ import Logo from "../../assets/logo.png";
 
 function ProfessorNavbar() {
   return (
-    <div className="headerBar flex">
-      <img src={Logo} className="w-3/12 mb-8" />
+    <div
+      className="headerBar flex bg-white pt-4 pl-4 pr-4 shadow-md"
+      style={{ position: "fixed", top: "0", width: "100%" }}
+    >
+      <img src={Logo} className="w-2/12 mb-8 " />
 
       <nav
         aria-label="primary"

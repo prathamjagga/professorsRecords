@@ -28,8 +28,25 @@ const Register = () => {
         // Show an alert for successful registration
         alert("Registration successful");
 
-        // Navigate to the login page
-        navigate("/");
+        const responseForOTP = await fetch(
+         
+          `http://localhost:3500/api/professors/sendOTP?email=${email}`,
+        { method:"GET",
+          headers:{
+            "Content-Type": "application/json",
+           }
+        }
+        );
+
+        if(responseForOTP.status === 201){
+            // show an alert for successfully OTP has been sended
+            alert("OTP has been send to the registered mail id");
+            navigate("/OTP")
+
+            // after verifying the OTP navigate to the login page
+          }
+
+
       } else {
         // Handle other error cases
         console.error("Registration failed:", response.status);

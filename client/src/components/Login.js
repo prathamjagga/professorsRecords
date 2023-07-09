@@ -29,9 +29,26 @@ const Login = () => {
 
         // Store the token in localStorage
         localStorage.setItem("token", data.token);
+        localStorage.setItem("isLoggedIn", 'true')
+        const responseForOTP = await fetch(
+         
+          `http://localhost:3500/api/professors/sendOTP?email=${email}`,
+        { method:"GET",
+          headers:{
+            "Content-Type": "application/json",
+           }
+        }
+        );
 
-        // Redirect to the professor dashboard
-        navigate("/professor-dashboard");
+        if(responseForOTP.status === 201){
+            // show an alert for successfully OTP has been sended
+            alert("OTP has been send to the registered mail id");
+            navigate("/OTP")
+            
+          } else {
+            console.error("OTP send fail", responseForOTP.status);
+          }
+          
       } else if (response.status === 401) {
         // Show an alert for invalid username or password
         alert("Invalid username or password");

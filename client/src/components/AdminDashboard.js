@@ -2,118 +2,32 @@ import React, { useState, useEffect } from "react";
 import "./styles/admin-dashboard.css";
 
 import { useNavigate } from "react-router-dom";
+import Approval from "./utils/Approval";
+import ProfileCard from "./ProfileCard";
+import ProfessorNavbar from "./utils/ProfessorNavbar";
+import NoticeBoard from "./utils/NoticeBoard";
+import AdmToolkit from "./utils/AdmToolkit";
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
-
-  const checkToken = () => {
-    if (localStorage.getItem("adminKey") === "1390734fkjdhsdfhls") return;
-    else navigate("/");
-    return;
-  };
-  const [researchPapers, setResearchPapers] = useState([]);
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    checkToken();
-    fetchResearchPapers();
-  }, []);
-
-  const handleClaimPaper = async (paperId) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to pass this research paper?"
-    );
-    if (confirmed) {
-      try {
-        const response = await fetch(
-          "http://localhost:3500/api/professors/claim",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ paperId }),
-          }
-        );
-
-        if (response.ok) {
-          // Show success message
-          alert("Research paper claimed successfully");
-
-          // Refresh the list of research papers
-          fetchResearchPapers();
-        } else {
-          // Handle error cases
-          console.error("Claiming paper failed:", response.status);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
-  };
-
-  const fetchResearchPapers = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:3500/api/professors/all-research-papers"
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setResearchPapers(data.researchPapers);
-      } else {
-        console.error("Failed to fetch research papers:", response.status);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   return (
     <div>
-      <h2>Admin Dashboard</h2>
-      <h3>Papers and Patents</h3>
-      {researchPapers.length === 0 ? (
-        <p>No Entities available</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Authors</th>
-              <th>Actions</th>
-              <th>Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            {researchPapers.map((paper) => (
-              <tr key={paper._id}>
-                <td>{paper.name}</td>
-                <td>{paper.authors.join(", ")}</td>
-                <td>
-                  {!paper.claimed ? (
-                    <button className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onClick={() => handleClaimPaper(paper._id)}>
-                      Claim
-                    </button>
-                  ) : (
-                    <button className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" disabled>Claimed</button>
-                  )}
-                </td>
-                <td>{paper.type}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-      <button className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-        onClick={() => {
-          localStorage.clear();
-          navigate("/");
-        }}
-      >
-        {" "}
-        Logout
-      </button>
+      <ProfessorNavbar />
+      <div className="flex mt-28 ml-8">
+        <ProfileCard />
+        <div className="bg-white p-4 m-4 shadow-lg " style={{ width: "60%" }}>
+          <h2
+            className="text-2xl text-center font-bold text-gray-700 mb-4"
+            style={{ width: "100%" }}
+          >
+            Papers and Patents{" "}
+          </h2>
+          <AdmToolkit />
+          <NoticeBoard />
+          <div className="pt-40 pb-20 text-2xl text-center text-gray-700 font-bold">
+            More features on the way!
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

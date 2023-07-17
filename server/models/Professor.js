@@ -2,14 +2,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const professorSchema = new mongoose.Schema({
-  email: {
+  phone: {
     type: String,
     required: true,
     unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
   },
   name: {
     type: String,
@@ -24,6 +20,10 @@ const professorSchema = new mongoose.Schema({
   },
   otpExpiry: {
     type: Date,
+  },
+  department: {
+    type: String,
+    required: true,
   },
 });
 

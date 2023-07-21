@@ -12,7 +12,10 @@ function ProfessorDashboard() {
       <ProfessorNavbar />
       <div className="flex">
         <ProfileCard />
-        <div className="bg-white/5 p-4 m-4 shadow-lg " style={{ width: "60%" }}>
+        <div
+          className="bg-white/100 p-4 m-4 shadow-lg "
+          style={{ width: "60%" }}
+        >
           <h2
             className="text-2xl text-center font-bold text-gray-700"
             style={{ width: "100%" }}

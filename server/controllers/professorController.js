@@ -1,11 +1,14 @@
 const Professor = require("../models/Professor");
 const ResearchPaper = require("../models/ResearchPaper");
+const Unregistered = require("../models/Unregistered");
 const { generateToken } = require("../utils/jwt");
+const { client } = require("../utils/twilio");
+const otpGenerator = require("otp-generator");
 
 // Professor registration
 const register = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { name, phone, otp, department } = req.body;
 
     // Check if professor already exists
     const professorExists = await Professor.findOne({ email });
@@ -13,15 +16,19 @@ const register = async (req, res) => {
       return res.status(400).json({ error: "Professor already exists" });
     }
 
-    // Create new professor
+    const Unreg = Unregistered.find({ phone });
+    if (!Unreg) res.json({ error: "please send otp first" }).status(400);
+    if (Unreg.otp != otp) res.json({ error: "wrong otp" }).status(400);
+
     const professor = new Professor({
-      email,
-      password,
+      department,
+      phone,
       name,
       coins: 0,
     });
 
     // Save the professor to the database
+
     await professor.save();
 
     // Generate JWT token
@@ -37,24 +44,15 @@ const register = async (req, res) => {
 // Professor login
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    // Find the professor by email
-    const professor = await Professor.findOne({ email });
-
-    // Check if professor exists and verify password
-    if (professor && (await professor.comparePassword(password))) {
-      // Generate JWT token
-      const token = generateToken(String(professor._id));
-      console.log(JSON.stringify(professor._id));
-
-      res.json({ token });
-    } else {
-      res.status(401).json({ error: "Invalid email or password" });
+    const { phone, otp } = req.body;
+    if (!Professor.find({ phone })) {
+      return res.json({ error: "professor does not exist" }).status(400);
     }
+    const Prof = Professor.find({ phone });
+    const token = generateToken(String(Prof._id));
+    res.status(200).json({ token });
   } catch (error) {
-    console.error("Error in professor login:", error);
-    res.status(500).json({ error: "Server error" });
+    res.json({ error }).status(500);
   }
 };
 
@@ -69,7 +67,7 @@ const getResearchPapers = async (req, res) => {
     // Find the research papers for the professor
     const researchPapers = await ResearchPaper.find({ professorId });
 
-    res.json({ researchPapers });
+    res.json({ researchPapers }).status(200);
   } catch (error) {
     console.error("Error in getting research papers:", error);
     res.status(500).json({ error: "Server error" });
@@ -83,10 +81,19 @@ const allResearchPapers = async (req, res) => {
     // Find the research papers for the professor
     const researchPapers = await ResearchPaper.find();
 
-    res.json({ researchPapers });
+    res.json({ researchPapers }).status(200);
   } catch (error) {
     console.error("Error in getting research papers:", error);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+const getRPByDept = async (req, res) => {
+  try {
+    const { department } = req.body;
+    return res.json(ResearchPaper.find({ department })).status(200);
+  } catch (error) {
+    return res.json({ error }).status(500);
   }
 };
 
@@ -162,6 +169,76 @@ const info = async (req, res) => {
 
 const sendOTP = async (req, res) => {};
 
+const getOTPForRegister = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (Professor.find({ phone })) {
+      return res.json({ error: "already registered" }).status(400);
+    }
+    if (Unregistered.find({ phone })) {
+      const Unreg = Unregistered.find({ phone });
+      const otp = otpGenerator.generate(6, {
+        digits: true,
+      });
+      Unreg.otp = otp;
+
+      await Unreg.save();
+      await client.messages.create({
+        body: `Your OTP from Panipat Institute of Engineering and Technology is: ${otp}`,
+        from: "+15418723758",
+        to: phone,
+      });
+    } else {
+      const otp = otpGenerator.generate(6, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+      const Unreg = new Unregistered({
+        phone,
+        otp,
+        otpExpiry: new Date(Date.now() + 5 * 60 * 1000),
+      });
+
+      await Unreg.save();
+      await client.messages.create({
+        body: `Your OTP from Panipat Institute of Engineering and Technology is: ${otp}`,
+        from: "+15418723758",
+        to: phone,
+      });
+    }
+    return res.json({ response: "successfully sent the otp" }).status(200);
+  } catch (error) {
+    return res.json({ error: "server error" }).status(500);
+  }
+};
+
+const getOtpForLogin = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const Prof = Professor.find({ phone });
+    Prof.otp = otp;
+    Prof.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+    Prof.save();
+    await client.messages.create({
+      body: `Your OTP from Panipat Institute of Engineering and Technology is: ${otp}`,
+      from: "+15418723758",
+      to: phone,
+    });
+    return res
+      .json({ success: "successfully sent the OTP for login" })
+      .status(200);
+  } catch (error) {
+    res.json({ error }).status(500);
+  }
+};
 module.exports = {
   register,
   login,

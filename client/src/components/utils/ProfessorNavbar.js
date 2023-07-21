@@ -3,8 +3,11 @@ import Logo from "../../assets/logo.png";
 
 function ProfessorNavbar() {
   return (
-    <div className="headerBar flex">
-      <img src={Logo} className="w-3/12 mb-8" />
+    <div
+      className="headerBar flex bg-white pt-4 pl-4 pr-4 shadow-md"
+      style={{ position: "fixed", top: "0", width: "100%" }}
+    >
+      <img src={Logo} className="w-2/12 mb-8 " />
 
       <nav
         aria-label="primary"
@@ -22,8 +25,12 @@ function ProfessorNavbar() {
           <div class="absolute z-10 hidden bg-grey-200 group-hover:block">
             <div class="px-2 pt-2 pb-4 bg-white bg-gray-200 shadow-lg">
               <div class="">
-                <div>hello</div>
-                <div>pratham</div>
+                <div>
+                  <button className="bg-gray-700 text-white font-bold">
+                    {" "}
+                    Logout
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -36,8 +43,7 @@ function ProfessorNavbar() {
           <div class="absolute z-10 hidden bg-grey-200 group-hover:block">
             <div class="px-2 pt-2 pb-4 bg-white bg-gray-200 shadow-lg">
               <div class="">
-                <div>hello</div>
-                <div>pratham</div>
+                <div>Video Guide Coming Soon</div>
               </div>
             </div>
           </div>

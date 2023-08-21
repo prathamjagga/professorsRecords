@@ -115,7 +115,7 @@ const Login = () => {
         Don't have an account? <Link to="/register">Register</Link>
       </p>
       <p>
-        <Link to="/">Admin Login</Link>
+        <Link to="/admin-login">Admin Login</Link>
       </p>
     </div>
   );
